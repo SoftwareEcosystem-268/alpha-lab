@@ -9,13 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check HTML exists
-        run: test -f index.html
+      - name: Check HTML files exist
+        run: |
+          test -f index.html
+          test -f login.html
       - name: Validate HTML structure
         run: |
           grep -q '<html' index.html
           grep -q '<head' index.html
           grep -q '<body' index.html
+          grep -q '<html' login.html
+          grep -q '<head' login.html
+          grep -q '<body' login.html
           echo "✅ HTML structure valid"
 
   deploy:
@@ -42,5 +47,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "index.html"
+          source: "*.html"
           target: ${{ secrets.DEPLOY_PATH }}

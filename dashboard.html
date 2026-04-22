@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha App - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9f9f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .nav-links a.active {
+            border-bottom: 2px solid white;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: background 0.3s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        /* Loading state */
+        .loading-overlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 2rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(245, 87, 108, 0.2);
+            border-radius: 50%;
+            border-top-color: #f5576c;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay p {
+            color: #666;
+        }
+
+        /* Error state */
+        .error-banner {
+            display: none;
+            background: #fff3f4;
+            border: 1px solid #f5c6cb;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .error-banner.show {
+            display: block;
+        }
+
+        .error-banner .error-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .error-banner h3 {
+            color: #dc3545;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-banner p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .btn-retry {
+            display: inline-block;
+            padding: 0.6rem 1.8rem;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 600;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(245, 87, 108, 0.3);
+        }
+
+        /* Dashboard content */
+        .dashboard-content {
+            display: none;
+        }
+
+        .dashboard-content.show {
+            display: block;
+        }
+
+        /* Profile card */
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .profile-info h2 {
+            font-size: 1.5rem;
+            color: #222;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-info .email {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: #d4edda;
+            color: #155724;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: #28a745;
+            border-radius: 50%;
+        }
+
+        /* Stat cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Recent activity */
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 1rem;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background: #fafafa;
+        }
+
+        .activity-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .activity-dot.pink  { background: #f5576c; }
+        .activity-dot.purple { background: #f093fb; }
+        .activity-dot.orange { background: #fda085; }
+
+        .activity-text {
+            flex: 1;
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .activity-time {
+            font-size: 0.82rem;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        /* Skeleton placeholders */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            border-radius: 8px;
+        }
+
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        footer {
+            background: #222;
+            color: #aaa;
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        footer span { color: #f5576c; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+
+            .profile-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Alpha</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="#" class="btn-logout" id="logoutBtn">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Loading state -->
+        <div class="loading-overlay" id="loadingState">
+            <div class="spinner"></div>
+            <p>Loading your profile...</p>
+        </div>
+
+        <!-- Error state -->
+        <div class="error-banner" id="errorBanner">
+            <div class="error-icon">⚠️</div>
+            <h3>Failed to load profile</h3>
+            <p id="errorMessage">Unable to connect to the server. Please try again.</p>
+            <button class="btn-retry" id="retryBtn">Try Again</button>
+        </div>
+
+        <!-- Dashboard content -->
+        <div class="dashboard-content" id="dashboardContent">
+
+            <!-- Profile card -->
+            <div class="profile-card" id="profileCard">
+                <div class="avatar" id="userAvatar">?</div>
+                <div class="profile-info">
+                    <h2 id="userName">—</h2>
+                    <p class="email" id="userEmail">—</p>
+                    <span class="status-badge">
+                        <span class="status-dot"></span>
+                        Active
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <span class="stat-icon">📋</span>
+                    <span class="stat-label">Projects</span>
+                    <span class="stat-value" id="statProjects">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-label">Tasks Done</span>
+                    <span class="stat-value" id="statTasks">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🏆</span>
+                    <span class="stat-label">Score</span>
+                    <span class="stat-value" id="statScore">—</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📅</span>
+                    <span class="stat-label">Days Active</span>
+                    <span class="stat-value" id="statDays">—</span>
+                </div>
+            </div>
+
+            <!-- Recent activity -->
+            <div class="section-title">Recent Activity</div>
+            <div class="activity-list" id="activityList"></div>
+
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 <span>Alpha App</span>. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const API_BASE = '';  // Set to your API base URL, e.g. 'https://api.example.com'
+
+        async function fetchUserData() {
+            const res = await fetch(`${API_BASE}/user/profile`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Attach auth token if stored in localStorage
+                    ...(localStorage.getItem('token') && {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    })
+                }
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.message || `Server error: ${res.status}`);
+            }
+
+            return res.json();
+        }
+
+        function getInitials(name) {
+            return name
+                .split(' ')
+                .map(w => w[0])
+                .slice(0, 2)
+                .join('')
+                .toUpperCase();
+        }
+
+        function renderProfile(data) {
+            document.getElementById('userAvatar').textContent = getInitials(data.name || 'U');
+            document.getElementById('userName').textContent = data.name || 'Unknown User';
+            document.getElementById('userEmail').textContent = data.email || '';
+
+            document.getElementById('statProjects').textContent = data.stats?.projects ?? '—';
+            document.getElementById('statTasks').textContent   = data.stats?.tasks    ?? '—';
+            document.getElementById('statScore').textContent   = data.stats?.score    ?? '—';
+            document.getElementById('statDays').textContent    = data.stats?.daysActive ?? '—';
+
+            const colors = ['pink', 'purple', 'orange'];
+            const activityList = document.getElementById('activityList');
+            const activities = data.recentActivity || [];
+
+            if (activities.length === 0) {
+                activityList.innerHTML = '<div class="activity-item"><span class="activity-text" style="color:#aaa">No recent activity.</span></div>';
+            } else {
+                activityList.innerHTML = activities.map((item, i) => `
+                    <div class="activity-item">
+                        <span class="activity-dot ${colors[i % colors.length]}"></span>
+                        <span class="activity-text">${escapeHtml(item.description)}</span>
+                        <span class="activity-time">${escapeHtml(item.time)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = String(str);
+            return d.innerHTML;
+        }
+
+        function showState(state) {
+            document.getElementById('loadingState').style.display    = state === 'loading'   ? 'flex'  : 'none';
+            document.getElementById('errorBanner').classList.toggle('show',     state === 'error');
+            document.getElementById('dashboardContent').classList.toggle('show', state === 'success');
+        }
+
+        async function loadDashboard() {
+            showState('loading');
+            try {
+                const data = await fetchUserData();
+                renderProfile(data);
+                showState('success');
+            } catch (err) {
+                document.getElementById('errorMessage').textContent = err.message || 'Unable to load profile data.';
+                showState('error');
+            }
+        }
+
+        document.getElementById('retryBtn').addEventListener('click', loadDashboard);
+
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        });
+
+        // Redirect to login if no token present
+        if (!localStorage.getItem('token')) {
+            // For demo purposes, load with mock data instead of redirecting
+            useMockData();
+        } else {
+            loadDashboard();
+        }
+
+        function useMockData() {
+            renderProfile({
+                name: 'Demo User',
+                email: 'demo@alpha.app',
+                stats: { projects: 5, tasks: 24, score: 870, daysActive: 14 },
+                recentActivity: [
+                    { description: 'Completed task "Setup CI/CD pipeline"', time: '2h ago' },
+                    { description: 'Joined project Alpha Lab',               time: '1d ago' },
+                    { description: 'Updated profile information',            time: '3d ago' }
+                ]
+            });
+            showState('success');
+        }
+    </script>
+
+</body>
+</html>

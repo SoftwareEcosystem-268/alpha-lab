@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha App - Smart Habit Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f9f9f9;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .nav-links a.active {
+            border-bottom: 2px solid white;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .student-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .student-details h1 {
+            font-size: 2rem;
+            color: #f5576c;
+            margin-bottom: 0.5rem;
+        }
+
+        .student-details p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: #f5576c;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* ============================================
+           QUICK STATS CARDS
+           ============================================ */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f5576c;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-progress {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .stat-progress-bar.success {
+            background: #28a745;
+        }
+
+        .stat-progress-bar.warning {
+            background: #ffc107;
+        }
+
+        .stat-progress-bar.danger {
+            background: #dc3545;
+        }
+
+        /* ============================================
+           HABIT ENTRY FORM
+           ============================================ */
+
+        .habit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #f5576c;
+            box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+        }
+
+        .form-group input.invalid {
+            border-color: #dc3545;
+        }
+
+        .form-group input.valid {
+            border-color: #28a745;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.9rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ============================================
+           CHART STYLES
+           ============================================ */
+
+        .chart-container {
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 250px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        /* Bar Chart Styles */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 200px;
+            gap: 8px;
+        }
+
+        .bar {
+            flex: 1;
+            max-width: 60px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s, transform 0.2s;
+            position: relative;
+            min-height: 4px;
+        }
+
+        .bar:hover {
+            transform: scaleY(1.05);
+            transform-origin: bottom;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #f5576c;
+        }
+
+        /* ============================================
+           HABIT LOG TABLE
+           ============================================ */
+
+        .habit-log {
+            overflow-x: auto;
+        }
+
+        .habit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .habit-table th,
+        .habit-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .habit-table th {
+            font-weight: 600;
+            color: #f5576c;
+            background: #f8f9fa;
+        }
+
+        .habit-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .habit-table .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .habit-table .status.on-track {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .habit-table .status.needs-improvement {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .habit-table .status.behind {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* ============================================
+           AI INSIGHTS PANEL
+           ============================================ */
+
+        .insights-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .insight-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #f5576c;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .insight-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .insight-card.positive {
+            border-left-color: #28a745;
+        }
+
+        .insight-card.warning {
+            border-left-color: #ffc107;
+        }
+
+        .insight-card.tip {
+            border-left-color: #17a2b8;
+        }
+
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-type {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .insight-priority {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .insight-message {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           LOADING STATES
+           ============================================ */
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(245, 87, 108, 0.3);
+            border-radius: 50%;
+            border-top-color: #f5576c;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        footer {
+            background: #222;
+            color: #aaa;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        footer span {
+            color: #f5576c;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .student-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bar-chart {
+                height: 150px;
+            }
+
+            .habit-table th,
+            .habit-table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ============================================
+           ENHANCED ANIMATIONS
+           ============================================ */
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .animate-slide-in {
+            animation: slideIn 0.4s ease-out forwards;
+        }
+
+        .card {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+
+        .insight-card {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .insight-card:nth-child(1) { animation-delay: 0.1s; }
+        .insight-card:nth-child(2) { animation-delay: 0.2s; }
+        .insight-card:nth-child(3) { animation-delay: 0.3s; }
+        .insight-card:nth-child(4) { animation-delay: 0.4s; }
+        .insight-card:nth-child(5) { animation-delay: 0.5s; }
+        .insight-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* ============================================
+           SUCCESS/ERROR STATES
+           ============================================ */
+
+        .success-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(40, 167, 69, 0.95);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ============================================
+           ACCESSIBILITY ENHANCEMENTS
+           ============================================ */
+
+        :focus-visible {
+            outline: 3px solid #f5576c;
+            outline-offset: 2px;
+        }
+
+        .btn:focus-visible,
+        input:focus-visible {
+            outline: 3px solid #f5576c;
+            outline-offset: 2px;
+        }
+
+        /* ============================================
+           ENHANCED LOADING STATES
+           ============================================ */
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-card {
+            height: 100px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Alpha</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="habit-analyzer.html" class="active">Habit Analyzer</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="page-header">
+            <div class="student-info">
+                <div class="student-avatar">6</div>
+                <div class="student-details">
+                    <h1>Smart Habit Analyzer</h1>
+                    <p>Student ID: 6709618174 • Track your daily habits and get AI-powered insights</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="card">
+                <h2>📊 Quick Stats</h2>
+                <div id="quickStats">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-value" id="statStudyTime">--</div>
+                            <div class="stat-label">Avg Study Time</div>
+                            <div class="stat-progress">
+                                <div class="stat-progress-bar" id="statStudyProgress"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">😴</div>
+                            <div class="stat-value" id="statSleep">--</div>
+                            <div class="stat-label">Avg Sleep</div>
+                            <div class="stat-progress">
+                                <div class="stat-progress-bar" id="statSleepProgress"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📱</div>
+                            <div class="stat-value" id="statScreen">--</div>
+                            <div class="stat-label">Avg Screen Time</div>
+                            <div class="stat-progress">
+                                <div class="stat-progress-bar" id="statScreenProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📅 Today's Habits</h2>
+                <form id="habitForm" class="habit-form">
+                    <div class="form-group">
+                        <label for="habitDate">Date</label>
+                        <input
+                            type="date"
+                            id="habitDate"
+                            name="habitDate"
+                            required
+                            aria-label="Habit date"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studyTime">Study Time (minutes)</label>
+                        <input
+                            type="number"
+                            id="studyTime"
+                            name="studyTime"
+                            required
+                            min="0"
+                            max="1440"
+                            placeholder="120"
+                            aria-label="Study time in minutes"
+                        >
+                        <div class="error-message" id="studyTimeError">Please enter a valid study time (0-1440 minutes)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sleepHours">Sleep Hours</label>
+                        <input
+                            type="number"
+                            id="sleepHours"
+                            name="sleepHours"
+                            required
+                            min="0"
+                            max="24"
+                            step="0.1"
+                            placeholder="7.5"
+                            aria-label="Sleep hours"
+                        >
+                        <div class="error-message" id="sleepHoursError">Please enter valid sleep hours (0-24)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="screenUsage">Screen Usage (minutes)</label>
+                        <input
+                            type="number"
+                            id="screenUsage"
+                            name="screenUsage"
+                            required
+                            min="0"
+                            max="1440"
+                            placeholder="240"
+                            aria-label="Screen usage in minutes"
+                        >
+                        <div class="error-message" id="screenUsageError">Please enter valid screen usage (0-1440 minutes)</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitHabit">
+                        Save Today's Habits
+                    </button>
+                </form>
+            </div>
+
+            <div class="card full-width">
+                <h2>📈 Habit Charts</h2>
+                <div id="habitCharts">
+                    <div class="chart-container">
+                        <div class="chart-title">Study Time (Last 7 Days)</div>
+                        <div class="chart-canvas">
+                            <div id="studyChart" class="bar-chart"></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-title">Sleep Hours (Last 7 Days)</div>
+                        <div class="chart-canvas">
+                            <div id="sleepChart" class="bar-chart"></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-title">Screen Usage (Last 7 Days)</div>
+                        <div class="chart-canvas">
+                            <div id="screenChart" class="bar-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2>📋 Habit Log</h2>
+                <div class="habit-log">
+                    <table class="habit-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Study Time</th>
+                                <th>Sleep Hours</th>
+                                <th>Screen Usage</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="habitLogBody">
+                            <tr>
+                                <td colspan="5" class="loading-container">
+                                    Loading habit data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <h2>🤖 AI Insights</h2>
+                <div id="aiInsights" class="insights-container">
+                    <div class="loading-container">
+                        <div class="loading"></div>
+                        <span>Generating personalized insights...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 <span>Alpha App</span>. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // ============================================
+        // DATA LAYER - localStorage & Data Management
+        // ============================================
+
+        const STORAGE_KEYS = {
+            HABIT_DATA: 'alpha_habit_analyzer_data',
+            STUDENT_PROFILE: 'alpha_student_profile_6709618174',
+            INSIGHTS_CACHE: 'alpha_insights_cache'
+        };
+
+        const STUDENT_ID = '6709618174';
+
+        // ============================================
+        // LOCALSTORAGE UTILITIES
+        // ============================================
+
+        const Storage = {
+            get(key, defaultValue = null) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : defaultValue;
+                } catch (error) {
+                    console.error('Error reading from localStorage:', error);
+                    return defaultValue;
+                }
+            },
+
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch (error) {
+                    console.error('Error writing to localStorage:', error);
+                    return false;
+                }
+            },
+
+            remove(key) {
+                try {
+                    localStorage.removeItem(key);
+                    return true;
+                } catch (error) {
+                    console.error('Error removing from localStorage:', error);
+                    return false;
+                }
+            },
+
+            clear() {
+                try {
+                    Object.values(STORAGE_KEYS).forEach(key => {
+                        localStorage.removeItem(key);
+                    });
+                    return true;
+                } catch (error) {
+                    console.error('Error clearing localStorage:', error);
+                    return false;
+                }
+            }
+        };
+
+        // ============================================
+        // DATA SCHEMAS
+        // ============================================
+
+        const createHabitEntry = (date, studyTime, sleepHours, screenUsage) => ({
+            date: date,
+            studyTime: parseInt(studyTime),      // minutes
+            sleepHours: parseFloat(sleepHours),  // hours
+            screenUsage: parseInt(screenUsage),   // minutes
+            timestamp: new Date(date).getTime()
+        });
+
+        const createStudentProfile = () => ({
+            studentId: STUDENT_ID,
+            name: 'Student 6709618174',
+            habits: [],
+            goals: {
+                studyTime: 180,    // daily target (minutes) - 3 hours
+                sleepHours: 8,    // daily target (hours)
+                screenUsage: 240   // daily limit (minutes) - 4 hours
+            },
+            createdAt: new Date().toISOString()
+        });
+
+        const createInsight = (type, message, priority, relevance) => ({
+            id: Date.now() + Math.random(),
+            type: type,              // 'positive', 'warning', 'tip', 'progress', 'predictive'
+            message: message,
+            priority: priority,      // 1-5, higher is more important
+            relevance: relevance,     // 0-1, higher is more relevant
+            createdAt: new Date().toISOString()
+        });
+
+        // ============================================
+        // DATA VALIDATION
+        // ============================================
+
+        const Validator = {
+            isValidDate(date) {
+                return !isNaN(new Date(date).getTime());
+            },
+
+            isValidStudyTime(minutes) {
+                const num = parseInt(minutes);
+                return !isNaN(num) && num >= 0 && num <= 1440; // max 24 hours
+            },
+
+            isValidSleepHours(hours) {
+                const num = parseFloat(hours);
+                return !isNaN(num) && num >= 0 && num <= 24;
+            },
+
+            isValidScreenUsage(minutes) {
+                const num = parseInt(minutes);
+                return !isNaN(num) && num >= 0 && num <= 1440; // max 24 hours
+            },
+
+            validateHabitEntry(entry) {
+                const errors = [];
+
+                if (!this.isValidDate(entry.date)) {
+                    errors.push('Invalid date format');
+                }
+
+                if (!this.isValidStudyTime(entry.studyTime)) {
+                    errors.push('Study time must be between 0 and 1440 minutes');
+                }
+
+                if (!this.isValidSleepHours(entry.sleepHours)) {
+                    errors.push('Sleep hours must be between 0 and 24 hours');
+                }
+
+                if (!this.isValidScreenUsage(entry.screenUsage)) {
+                    errors.push('Screen usage must be between 0 and 1440 minutes');
+                }
+
+                return {
+                    isValid: errors.length === 0,
+                    errors: errors
+                };
+            }
+        };
+
+        // ============================================
+        // CRUD OPERATIONS
+        // ============================================
+
+        const HabitData = {
+            // Initialize or get student profile
+            getProfile() {
+                let profile = Storage.get(STORAGE_KEYS.STUDENT_PROFILE);
+                if (!profile) {
+                    profile = createStudentProfile();
+                    Storage.set(STORAGE_KEYS.STUDENT_PROFILE, profile);
+                }
+                return profile;
+            },
+
+            // Get all habit entries
+            getAllHabits() {
+                const profile = this.getProfile();
+                return profile.habits || [];
+            },
+
+            // Get habit entry by date
+            getHabitByDate(date) {
+                const habits = this.getAllHabits();
+                return habits.find(h => h.date === date) || null;
+            },
+
+            // Add new habit entry
+            addHabit(date, studyTime, sleepHours, screenUsage) {
+                const entry = createHabitEntry(date, studyTime, sleepHours, screenUsage);
+                const validation = Validator.validateHabitEntry(entry);
+
+                if (!validation.isValid) {
+                    throw new Error(validation.errors.join(', '));
+                }
+
+                const profile = this.getProfile();
+
+                // Check if entry for this date already exists
+                const existingIndex = profile.habits.findIndex(h => h.date === date);
+
+                if (existingIndex >= 0) {
+                    // Update existing entry
+                    profile.habits[existingIndex] = entry;
+                } else {
+                    // Add new entry
+                    profile.habits.push(entry);
+                }
+
+                // Sort by date (newest first)
+                profile.habits.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                Storage.set(STORAGE_KEYS.STUDENT_PROFILE, profile);
+                return entry;
+            },
+
+            // Update habit entry
+            updateHabit(date, updates) {
+                const profile = this.getProfile();
+                const index = profile.habits.findIndex(h => h.date === date);
+
+                if (index < 0) {
+                    throw new Error('Habit entry not found for date: ' + date);
+                }
+
+                const updatedEntry = { ...profile.habits[index], ...updates };
+                const validation = Validator.validateHabitEntry(updatedEntry);
+
+                if (!validation.isValid) {
+                    throw new Error(validation.errors.join(', '));
+                }
+
+                profile.habits[index] = updatedEntry;
+                Storage.set(STORAGE_KEYS.STUDENT_PROFILE, profile);
+                return updatedEntry;
+            },
+
+            // Delete habit entry
+            deleteHabit(date) {
+                const profile = this.getProfile();
+                const initialLength = profile.habits.length;
+                profile.habits = profile.habits.filter(h => h.date !== date);
+
+                if (profile.habits.length === initialLength) {
+                    throw new Error('Habit entry not found for date: ' + date);
+                }
+
+                Storage.set(STORAGE_KEYS.STUDENT_PROFILE, profile);
+                return true;
+            },
+
+            // Get habits for date range
+            getHabitsInDateRange(startDate, endDate) {
+                const habits = this.getAllHabits();
+                return habits.filter(h => {
+                    const habitDate = new Date(h.date);
+                    return habitDate >= new Date(startDate) && habitDate <= new Date(endDate);
+                });
+            },
+
+            // Get today's habits
+            getTodayHabits() {
+                const today = new Date().toISOString().split('T')[0];
+                return this.getHabitByDate(today);
+            },
+
+            // Get habits for last N days
+            getRecentHabits(days = 7) {
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - days);
+
+                return this.getAllHabits().filter(h => {
+                    return new Date(h.date) >= cutoffDate;
+                });
+            }
+        };
+
+        // ============================================
+        // SAMPLE DATA GENERATION
+        // ============================================
+
+        const generateSampleData = () => {
+            const today = new Date();
+            const sampleData = [];
+
+            for (let i = 14; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+
+                // Generate realistic random data with some patterns
+                const studyTime = Math.floor(Math.random() * 180) + 60; // 1-4 hours
+                const sleepHours = parseFloat((Math.random() * 4 + 5).toFixed(1)); // 5-9 hours
+                const screenUsage = Math.floor(Math.random() * 300) + 120; // 2-7 hours
+
+                sampleData.push(createHabitEntry(dateStr, studyTime, sleepHours, screenUsage));
+            }
+
+            return sampleData;
+        };
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        const initializeData = () => {
+            const profile = HabitData.getProfile();
+
+            // If no habits exist, add sample data
+            if (!profile.habits || profile.habits.length === 0) {
+                console.log('Initializing sample data for student:', STUDENT_ID);
+                const sampleHabits = generateSampleData();
+
+                profile.habits = sampleHabits;
+                Storage.set(STORAGE_KEYS.STUDENT_PROFILE, profile);
+
+                console.log('Sample data initialized:', sampleHabits.length, 'days of data');
+            }
+
+            return profile;
+        };
+
+        // Initialize on page load
+        console.log('Smart Habit Analyzer loaded for student:', STUDENT_ID);
+        const userProfile = initializeData();
+        console.log('User profile loaded:', userProfile);
+
+        // ============================================
+        // UI UPDATE FUNCTIONS
+        // ============================================
+
+        const UI = {
+            // Update quick stats cards
+            updateQuickStats() {
+                const recentHabits = HabitData.getRecentHabits(7);
+                const goals = userProfile.goals;
+
+                if (recentHabits.length === 0) {
+                    document.getElementById('statStudyTime').textContent = '--';
+                    document.getElementById('statSleep').textContent = '--';
+                    document.getElementById('statScreen').textContent = '--';
+                    return;
+                }
+
+                // Calculate averages
+                const avgStudy = Math.round(recentHabits.reduce((sum, h) => sum + h.studyTime, 0) / recentHabits.length);
+                const avgSleep = (recentHabits.reduce((sum, h) => sum + h.sleepHours, 0) / recentHabits.length).toFixed(1);
+                const avgScreen = Math.round(recentHabits.reduce((sum, h) => sum + h.screenUsage, 0) / recentHabits.length);
+
+                // Update values
+                document.getElementById('statStudyTime').textContent = `${avgStudy}m`;
+                document.getElementById('statSleep').textContent = `${avgSleep}h`;
+                document.getElementById('statScreen').textContent = `${avgScreen}m`;
+
+                // Update progress bars
+                this.updateProgressBar('statStudyProgress', avgStudy, goals.studyTime, true);
+                this.updateProgressBar('statSleepProgress', avgSleep, goals.sleepHours, true);
+                this.updateProgressBar('statScreenProgress', avgScreen, goals.screenUsage, false);
+            },
+
+            updateProgressBar(elementId, current, target, isHigherBetter) {
+                const element = document.getElementById(elementId);
+                let percentage = Math.min((current / target) * 100, 100);
+
+                // Determine status class
+                let statusClass = '';
+                if (isHigherBetter) {
+                    if (current >= target * 0.8) statusClass = 'success';
+                    else if (current >= target * 0.5) statusClass = 'warning';
+                    else statusClass = 'danger';
+                } else {
+                    if (current <= target * 1.2) statusClass = 'success';
+                    else if (current <= target * 1.5) statusClass = 'warning';
+                    else statusClass = 'danger';
+                }
+
+                element.style.width = `${percentage}%`;
+                element.className = `stat-progress-bar ${statusClass}`;
+            },
+
+            // Render bar chart
+            renderBarChart(containerId, data, valueKey, labelKey, maxValue) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="loading-container">No data available</div>';
+                    return;
+                }
+
+                // Reverse data to show oldest to newest
+                const chartData = [...data].reverse();
+
+                chartData.forEach((item, index) => {
+                    const value = item[valueKey];
+                    const label = item[labelKey];
+                    const height = maxValue > 0 ? (value / maxValue) * 100 : 0;
+
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = `${Math.max(height, 4)}%`; // Minimum 4% height
+
+                    // Add value label
+                    const valueLabel = document.createElement('div');
+                    valueLabel.className = 'bar-value';
+                    valueLabel.textContent = value;
+                    bar.appendChild(valueLabel);
+
+                    // Add date label
+                    const dateLabel = document.createElement('div');
+                    dateLabel.className = 'bar-label';
+                    const date = new Date(label);
+                    dateLabel.textContent = `${date.getMonth() + 1}/${date.getDate()}`;
+                    bar.appendChild(dateLabel);
+
+                    container.appendChild(bar);
+                });
+            },
+
+            // Render all charts
+            renderCharts() {
+                const recentHabits = HabitData.getRecentHabits(7);
+
+                if (recentHabits.length === 0) {
+                    document.getElementById('studyChart').innerHTML = '<div class="loading-container">No data available</div>';
+                    document.getElementById('sleepChart').innerHTML = '<div class="loading-container">No data available</div>';
+                    document.getElementById('screenChart').innerHTML = '<div class="loading-container">No data available</div>';
+                    return;
+                }
+
+                // Calculate max values for scaling
+                const maxStudy = Math.max(...recentHabits.map(h => h.studyTime));
+                const maxSleep = Math.max(...recentHabits.map(h => h.sleepHours));
+                const maxScreen = Math.max(...recentHabits.map(h => h.screenUsage));
+
+                // Render charts
+                this.renderBarChart('studyChart', recentHabits, 'studyTime', 'date', maxStudy);
+                this.renderBarChart('sleepChart', recentHabits, 'sleepHours', 'date', maxSleep);
+                this.renderBarChart('screenChart', recentHabits, 'screenUsage', 'date', maxScreen);
+            },
+
+            // Render habit log table
+            renderHabitLog() {
+                const habits = HabitData.getAllHabits();
+                const tbody = document.getElementById('habitLogBody');
+                tbody.innerHTML = '';
+
+                if (habits.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="loading-container">No habit data available</td></tr>';
+                    return;
+                }
+
+                habits.forEach(habit => {
+                    const row = document.createElement('tr');
+
+                    // Determine status
+                    const goals = userProfile.goals;
+                    let status = 'on-track';
+                    let statusText = 'On Track';
+
+                    if (habit.studyTime < goals.studyTime * 0.5 ||
+                        habit.sleepHours < goals.sleepHours * 0.8 ||
+                        habit.screenUsage > goals.screenUsage * 1.5) {
+                        status = 'behind';
+                        statusText = 'Needs Improvement';
+                    } else if (habit.studyTime < goals.studyTime * 0.8 ||
+                               habit.sleepHours < goals.sleepHours ||
+                               habit.screenUsage > goals.screenUsage * 1.2) {
+                        status = 'needs-improvement';
+                        statusText = 'Below Target';
+                    }
+
+                    row.innerHTML = `
+                        <td>${habit.date}</td>
+                        <td>${habit.studyTime} min</td>
+                        <td>${habit.sleepHours} hrs</td>
+                        <td>${habit.screenUsage} min</td>
+                        <td><span class="status ${status}">${statusText}</span></td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+            },
+
+            // Set today's date in form
+            setTodayDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('habitDate').value = today;
+
+                // Check if today's habits already exist
+                const existingHabits = HabitData.getHabitByDate(today);
+                if (existingHabits) {
+                    document.getElementById('studyTime').value = existingHabits.studyTime;
+                    document.getElementById('sleepHours').value = existingHabits.sleepHours;
+                    document.getElementById('screenUsage').value = existingHabits.screenUsage;
+                    document.getElementById('submitHabit').textContent = 'Update Today\'s Habits';
+                }
+            }
+        };
+
+        // ============================================
+        // ENHANCED FORM HANDLING WITH ERROR HANDLING
+        // ============================================
+
+        const habitForm = document.getElementById('habitForm');
+        const studyTimeInput = document.getElementById('studyTime');
+        const sleepHoursInput = document.getElementById('sleepHours');
+        const screenUsageInput = document.getElementById('screenUsage');
+        const submitBtn = document.getElementById('submitHabit');
+
+        // Show error overlay
+        const showError = (message) => {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-overlay';
+            errorDiv.innerHTML = `
+                <h3>⚠️ Error</h3>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="this.parentElement.remove()" style="margin-top: 1rem;">Close</button>
+            `;
+            document.body.appendChild(errorDiv);
+
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        };
+
+        // Show success overlay
+        const showSuccess = (message) => {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-overlay';
+            successDiv.innerHTML = `
+                <h3>✅ Success</h3>
+                <p>${message}</p>
+            `;
+            document.body.appendChild(successDiv);
+
+            setTimeout(() => {
+                successDiv.remove();
+            }, 2000);
+        };
+
+        // Real-time validation with visual feedback
+        studyTimeInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const isValid = Validator.isValidStudyTime(value);
+
+            if (value && !isValid) {
+                this.classList.add('invalid');
+                this.classList.remove('valid');
+                document.getElementById('studyTimeError').classList.add('show');
+            } else if (value) {
+                this.classList.remove('invalid');
+                this.classList.add('valid');
+                document.getElementById('studyTimeError').classList.remove('show');
+            }
+        });
+
+        sleepHoursInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            const isValid = Validator.isValidSleepHours(value);
+
+            if (value && !isValid) {
+                this.classList.add('invalid');
+                this.classList.remove('valid');
+                document.getElementById('sleepHoursError').classList.add('show');
+            } else if (value) {
+                this.classList.remove('invalid');
+                this.classList.add('valid');
+                document.getElementById('sleepHoursError').classList.remove('show');
+            }
+        });
+
+        screenUsageInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const isValid = Validator.isValidScreenUsage(value);
+
+            if (value && !isValid) {
+                this.classList.add('invalid');
+                this.classList.remove('valid');
+                document.getElementById('screenUsageError').classList.add('show');
+            } else if (value) {
+                this.classList.remove('invalid');
+                this.classList.add('valid');
+                document.getElementById('screenUsageError').classList.remove('show');
+            }
+        });
+
+        // Enhanced form submission with better error handling
+        habitForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const date = document.getElementById('habitDate').value;
+            const studyTime = parseInt(studyTimeInput.value);
+            const sleepHours = parseFloat(sleepHoursInput.value);
+            const screenUsage = parseInt(screenUsageInput.value);
+
+            // Validate all fields
+            if (!date || !studyTime || !sleepHours || !screenUsage) {
+                showError('Please fill in all fields with valid values.');
+                return;
+            }
+
+            try {
+                // Disable button and show loading state
+                submitBtn.disabled = true;
+                const originalText = submitBtn.textContent;
+                submitBtn.innerHTML = '<span class="loading"></span> Saving...';
+
+                // Simulate async operation for better UX
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Save habit data
+                HabitData.addHabit(date, studyTime, sleepHours, screenUsage);
+
+                // Show success feedback
+                showSuccess('Habit data saved successfully!');
+
+                // Update UI with animation
+                submitBtn.innerHTML = '✓ Saved!';
+                submitBtn.style.background = '#28a745';
+
+                // Update all UI components
+                setTimeout(() => {
+                    UI.updateQuickStats();
+                    UI.renderCharts();
+                    UI.renderHabitLog();
+                    generateInsights();
+
+                    // Reset button state
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Update Today\'s Habits';
+                        submitBtn.style.background = '';
+                    }, 1000);
+                }, 300);
+
+            } catch (error) {
+                console.error('Error saving habit data:', error);
+                showError('Failed to save habit data: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+
+        // ============================================
+        // ENHANCED UI UPDATE FUNCTIONS
+        // ============================================
+
+        const UI = {
+            // Update quick stats cards with animation
+            updateQuickStats() {
+                const recentHabits = HabitData.getRecentHabits(7);
+                const goals = userProfile.goals;
+
+                if (recentHabits.length === 0) {
+                    document.getElementById('statStudyTime').textContent = '--';
+                    document.getElementById('statSleep').textContent = '--';
+                    document.getElementById('statScreen').textContent = '--';
+                    return;
+                }
+
+                // Calculate averages
+                const avgStudy = Math.round(recentHabits.reduce((sum, h) => sum + h.studyTime, 0) / recentHabits.length);
+                const avgSleep = (recentHabits.reduce((sum, h) => sum + h.sleepHours, 0) / recentHabits.length).toFixed(1);
+                const avgScreen = Math.round(recentHabits.reduce((sum, h) => sum + h.screenUsage, 0) / recentHabits.length);
+
+                // Animate value updates
+                this.animateValue('statStudyTime', avgStudy, 'm');
+                this.animateValue('statSleep', avgSleep, 'h');
+                this.animateValue('statScreen', avgScreen, 'm');
+
+                // Update progress bars
+                this.updateProgressBar('statStudyProgress', avgStudy, goals.studyTime, true);
+                this.updateProgressBar('statSleepProgress', avgSleep, goals.sleepHours, true);
+                this.updateProgressBar('statScreenProgress', avgScreen, goals.screenUsage, false);
+            },
+
+            animateValue(elementId, newValue, unit) {
+                const element = document.getElementById(elementId);
+                const currentValue = parseFloat(element.textContent) || 0;
+                const duration = 500;
+                const steps = 20;
+                const increment = (newValue - currentValue) / steps;
+                let step = 0;
+
+                const timer = setInterval(() => {
+                    step++;
+                    const value = currentValue + (increment * step);
+                    element.textContent = (Number.isInteger(newValue) ? Math.round(value) : value.toFixed(1)) + unit;
+
+                    if (step >= steps) {
+                        clearInterval(timer);
+                        element.textContent = newValue + unit;
+                    }
+                }, duration / steps);
+            },
+
+            updateProgressBar(elementId, current, target, isHigherBetter) {
+                const element = document.getElementById(elementId);
+                let percentage = Math.min((current / target) * 100, 100);
+
+                // Determine status class
+                let statusClass = '';
+                if (isHigherBetter) {
+                    if (current >= target * 0.8) statusClass = 'success';
+                    else if (current >= target * 0.5) statusClass = 'warning';
+                    else statusClass = 'danger';
+                } else {
+                    if (current <= target * 1.2) statusClass = 'success';
+                    else if (current <= target * 1.5) statusClass = 'warning';
+                    else statusClass = 'danger';
+                }
+
+                element.style.width = `${percentage}%`;
+                element.className = `stat-progress-bar ${statusClass}`;
+            },
+
+            // Render bar chart with enhanced animation
+            renderBarChart(containerId, data, valueKey, labelKey, maxValue) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="loading-container">No data available</div>';
+                    return;
+                }
+
+                // Reverse data to show oldest to newest
+                const chartData = [...data].reverse();
+
+                chartData.forEach((item, index) => {
+                    const value = item[valueKey];
+                    const label = item[labelKey];
+                    const height = maxValue > 0 ? (value / maxValue) * 100 : 0;
+
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = `${Math.max(height, 4)}%`; // Minimum 4% height
+                    bar.style.animationDelay = `${index * 0.1}s`; // Staggered animation
+
+                    // Add value label
+                    const valueLabel = document.createElement('div');
+                    valueLabel.className = 'bar-value';
+                    valueLabel.textContent = value;
+                    bar.appendChild(valueLabel);
+
+                    // Add date label
+                    const dateLabel = document.createElement('div');
+                    dateLabel.className = 'bar-label';
+                    const date = new Date(label);
+                    dateLabel.textContent = `${date.getMonth() + 1}/${date.getDate()}`;
+                    bar.appendChild(dateLabel);
+
+                    container.appendChild(bar);
+                });
+            },
+
+            // Render all charts
+            renderCharts() {
+                const recentHabits = HabitData.getRecentHabits(7);
+
+                if (recentHabits.length === 0) {
+                    document.getElementById('studyChart').innerHTML = '<div class="loading-container">No data available</div>';
+                    document.getElementById('sleepChart').innerHTML = '<div class="loading-container">No data available</div>';
+                    document.getElementById('screenChart').innerHTML = '<div class="loading-container">No data available</div>';
+                    return;
+                }
+
+                // Calculate max values for scaling
+                const maxStudy = Math.max(...recentHabits.map(h => h.studyTime));
+                const maxSleep = Math.max(...recentHabits.map(h => h.sleepHours));
+                const maxScreen = Math.max(...recentHabits.map(h => h.screenUsage));
+
+                // Render charts
+                this.renderBarChart('studyChart', recentHabits, 'studyTime', 'date', maxStudy);
+                this.renderBarChart('sleepChart', recentHabits, 'sleepHours', 'date', maxSleep);
+                this.renderBarChart('screenChart', recentHabits, 'screenUsage', 'date', maxScreen);
+            },
+
+            // Render habit log table with enhanced features
+            renderHabitLog() {
+                const habits = HabitData.getAllHabits();
+                const tbody = document.getElementById('habitLogBody');
+                tbody.innerHTML = '';
+
+                if (habits.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="loading-container">No habit data available. Start by adding today\'s habits!</td></tr>';
+                    return;
+                }
+
+                habits.forEach((habit, index) => {
+                    const row = document.createElement('tr');
+                    row.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s forwards`;
+                    row.style.opacity = '0'; // Start invisible for animation
+
+                    // Determine status
+                    const goals = userProfile.goals;
+                    let status = 'on-track';
+                    let statusText = 'On Track';
+
+                    if (habit.studyTime < goals.studyTime * 0.5 ||
+                        habit.sleepHours < goals.sleepHours * 0.8 ||
+                        habit.screenUsage > goals.screenUsage * 1.5) {
+                        status = 'behind';
+                        statusText = 'Needs Improvement';
+                    } else if (habit.studyTime < goals.studyTime * 0.8 ||
+                               habit.sleepHours < goals.sleepHours ||
+                               habit.screenUsage > goals.screenUsage * 1.2) {
+                        status = 'needs-improvement';
+                        statusText = 'Below Target';
+                    }
+
+                    row.innerHTML = `
+                        <td>${habit.date}</td>
+                        <td>${habit.studyTime} min</td>
+                        <td>${habit.sleepHours} hrs</td>
+                        <td>${habit.screenUsage} min</td>
+                        <td><span class="status ${status}">${statusText}</span></td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+            },
+
+            // Set today's date in form
+            setTodayDate() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('habitDate').value = today;
+
+                // Check if today's habits already exist
+                const existingHabits = HabitData.getHabitByDate(today);
+                if (existingHabits) {
+                    document.getElementById('studyTime').value = existingHabits.studyTime;
+                    document.getElementById('sleepHours').value = existingHabits.sleepHours;
+                    document.getElementById('screenUsage').value = existingHabits.screenUsage;
+                    document.getElementById('submitHabit').textContent = 'Update Today\'s Habits';
+                }
+            }
+        };
+
+        // ============================================
+        // PHASE 4: AI INSIGHTS SYSTEM (Enhanced Implementation)
+        // ============================================
+
+        const InsightAnalyzer = {
+            // Calculate variance to measure consistency
+            calculateVariance(data, key) {
+                const mean = data.reduce((sum, item) => sum + item[key], 0) / data.length;
+                const variance = data.reduce((sum, item) => sum + Math.pow(item[key] - mean, 2), 0) / data.length;
+                return Math.sqrt(variance); // Return standard deviation
+            },
+
+            // Analyze day-of-week patterns
+            analyzeDayPatterns(habits) {
+                const dayStats = {};
+                habits.forEach(habit => {
+                    const day = new Date(habit.date).getDay();
+                    if (!dayStats[day]) {
+                        dayStats[day] = { study: 0, sleep: 0, screen: 0, count: 0 };
+                    }
+                    dayStats[day].study += habit.studyTime;
+                    dayStats[day].sleep += habit.sleepHours;
+                    dayStats[day].screen += habit.screenUsage;
+                    dayStats[day].count++;
+                });
+
+                // Calculate averages for each day
+                Object.keys(dayStats).forEach(day => {
+                    dayStats[day].avgStudy = dayStats[day].study / dayStats[day].count;
+                    dayStats[day].avgSleep = dayStats[day].sleep / dayStats[day].count;
+                    dayStats[day].avgScreen = dayStats[day].screen / dayStats[day].count;
+                });
+
+                return dayStats;
+            },
+
+            // Identify trends (improving, declining, stable)
+            analyzeTrend(habits, key) {
+                if (habits.length < 3) return 'stable';
+
+                const recent = habits.slice(0, Math.ceil(habits.length / 2));
+                const older = habits.slice(Math.ceil(habits.length / 2));
+
+                const recentAvg = recent.reduce((sum, h) => sum + h[key], 0) / recent.length;
+                const olderAvg = older.reduce((sum, h) => sum + h[key], 0) / older.length;
+
+                const change = ((recentAvg - olderAvg) / olderAvg) * 100;
+
+                if (change > 10) return 'improving';
+                if (change < -10) return 'declining';
+                return 'stable';
+            }
+        };
+
+        const generateInsights = () => {
+            const insights = [];
+            const recentHabits = HabitData.getRecentHabits(7);
+            const goals = userProfile.goals;
+
+            if (recentHabits.length < 3) {
+                document.getElementById('aiInsights').innerHTML = `
+                    <div class="loading-container">
+                        Add more habit data (minimum 3 days) to generate personalized insights!
+                    </div>
+                `;
+                return;
+            }
+
+            // ============================================
+            // STUDY PATTERN ANALYSIS
+            // ============================================
+
+            const avgStudy = recentHabits.reduce((sum, h) => sum + h.studyTime, 0) / recentHabits.length;
+            const studyVariance = InsightAnalyzer.calculateVariance(recentHabits, 'studyTime');
+            const studyTrend = InsightAnalyzer.analyzeTrend(recentHabits, 'studyTime');
+
+            if (avgStudy >= goals.studyTime * 0.9) {
+                insights.push(createInsight('positive',
+                    `🎯 Excellent study consistency! You're averaging ${Math.round(avgStudy)} minutes daily (${Math.round((avgStudy/goals.studyTime)*100)}% of goal). ${studyTrend === 'improving' ? '📈 Your study time is trending upward!' : 'Keep maintaining this great momentum!'}`,
+                    5, 0.95
+                ));
+            } else if (avgStudy >= goals.studyTime * 0.7) {
+                insights.push(createInsight('progress',
+                    `📈 Good progress! Your ${Math.round(avgStudy)}-minute average is ${Math.round((avgStudy/goals.studyTime)*100)}% of your ${goals.studyTime}-minute goal. ${studyTrend === 'improving' ? 'You\'re on the right track!' : 'Try adding 15 more minutes daily.'}`,
+                    4, 0.85
+                ));
+            } else {
+                insights.push(createInsight('tip',
+                    `💡 Study boost needed! Your ${Math.round(avgStudy)}-minute average needs improvement. Try the 2-minute rule: start with just 2 minutes, then build momentum. Small wins lead to big results!`,
+                    5, 0.9
+                ));
+            }
+
+            // Study consistency insight
+            if (studyVariance < 30) {
+                insights.push(createInsight('positive',
+                    `🔥 Outstanding consistency! Your study time varies by only ${Math.round(studyVariance)} minutes daily. Consistency beats intensity - you're building sustainable habits!`,
+                    4, 0.8
+                ));
+            } else if (studyVariance > 90) {
+                insights.push(createInsight('warning',
+                    `⚠️ Study time varies significantly (${Math.round(studyVariance)} minutes standard deviation). Try establishing a fixed study schedule for better consistency.`,
+                    3, 0.75
+                ));
+            }
+
+            // ============================================
+            // SLEEP PATTERN ANALYSIS
+            // ============================================
+
+            const avgSleep = recentHabits.reduce((sum, h) => sum + h.sleepHours, 0) / recentHabits.length;
+            const sleepVariance = InsightAnalyzer.calculateVariance(recentHabits, 'sleepHours');
+
+            if (avgSleep >= goals.sleepHours * 0.9) {
+                insights.push(createInsight('positive',
+                    `😴 Perfect sleep hygiene! ${avgSleep.toFixed(1)} hours average supports optimal memory consolidation and cognitive function. Your brain is getting the rest it needs!`,
+                    5, 0.9
+                ));
+            } else if (avgSleep >= 7) {
+                insights.push(createInsight('progress',
+                    `😊 Good sleep foundation! ${avgSleep.toFixed(1)} hours is decent, but aim for ${goals.sleepHours} hours for peak performance. Even 30 extra minutes improves focus significantly.`,
+                    4, 0.8
+                ));
+            } else if (avgSleep < 6) {
+                insights.push(createInsight('warning',
+                    `🚨 Sleep deficit alert! ${avgSleep.toFixed(1)} hours is insufficient. Chronic sleep deprivation impairs learning, memory, and decision-making. Prioritize 7-8 hours tonight!`,
+                    5, 0.95
+                ));
+            }
+
+            // Sleep consistency insight
+            if (sleepVariance < 1) {
+                insights.push(createInsight('positive',
+                    `🌙 Amazing sleep consistency! Your bedtime varies by less than 1 hour. This regulates your circadian rhythm and improves sleep quality dramatically.`,
+                    4, 0.85
+                ));
+            }
+
+            // ============================================
+            // SCREEN USAGE ANALYSIS
+            // ============================================
+
+            const avgScreen = recentHabits.reduce((sum, h) => sum + h.screenUsage, 0) / recentHabits.length;
+            const screenTrend = InsightAnalyzer.analyzeTrend(recentHabits, 'screenUsage');
+
+            if (avgScreen <= goals.screenUsage * 0.8) {
+                insights.push(createInsight('positive',
+                    `📱 Outstanding digital discipline! ${Math.round(avgScreen)} minutes daily is well under your ${goals.screenUsage}-minute limit. ${screenTrend === 'declining' ? '📉 Your screen time is decreasing - excellent!' : 'You\'re mastering digital wellness!'}`,
+                    4, 0.85
+                ));
+            } else if (avgScreen <= goals.screenUsage) {
+                insights.push(createInsight('progress',
+                    `📱 Good screen management! ${Math.round(avgScreen)} minutes is within limits. ${screenTrend === 'declining' ? 'Great job reducing screen time!' : 'Monitor usage to stay on track.'}`,
+                    3, 0.75
+                ));
+            } else if (avgScreen > goals.screenUsage * 1.5) {
+                insights.push(createInsight('warning',
+                    `📱 Screen time over target! ${Math.round(avgScreen)} minutes is ${Math.round((avgScreen/goals.screenUsage)*100)}% over your limit. Try app blockers, screen time reminders, or designated phone-free zones.`,
+                    5, 0.9
+                ));
+            }
+
+            // ============================================
+            // PRODUCTIVITY CORRELATION ANALYSIS
+            // ============================================
+
+            const productiveDays = recentHabits.filter(h =>
+                h.studyTime >= goals.studyTime * 0.8 && h.screenUsage <= goals.screenUsage * 1.2
+            );
+
+            const productivityRate = (productiveDays.length / recentHabits.length) * 100;
+
+            if (productivityRate >= 80) {
+                insights.push(createInsight('positive',
+                    `🚀 Exceptional productivity! ${productivityRate.toFixed(0)}% of days meet both study and screen goals. You've mastered the balance between focused work and digital wellness!`,
+                    5, 0.95
+                ));
+            } else if (productivityRate >= 60) {
+                insights.push(createInsight('progress',
+                    `📊 Strong productivity foundation! ${productivityRate.toFixed(0)}% of days are optimized. Identify patterns in your high-productivity days and replicate them more consistently.`,
+                    4, 0.8
+                ));
+            } else {
+                insights.push(createInsight('tip',
+                    `🎯 Productivity optimization opportunity! Currently ${productivityRate.toFixed(0)}% of days meet targets. Focus on one habit at a time - either increase study OR reduce screen time for better results.`,
+                    4, 0.85
+                ));
+            }
+
+            // ============================================
+            // DAY-OF-WEEK PATTERN ANALYSIS
+            // ============================================
+
+            const dayPatterns = InsightAnalyzer.analyzeDayPatterns(recentHabits);
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            let bestDay = null;
+            let worstDay = null;
+            let bestProductivity = 0;
+            let worstProductivity = Infinity;
+
+            Object.keys(dayPatterns).forEach(day => {
+                const dayData = dayPatterns[day];
+                const productivityScore = (dayData.avgStudy / goals.studyTime) - (dayData.avgScreen / goals.screenUsage);
+
+                if (productivityScore > bestProductivity) {
+                    bestProductivity = productivityScore;
+                    bestDay = { name: dayNames[day], ...dayData };
+                }
+
+                if (productivityScore < worstProductivity) {
+                    worstProductivity = productivityScore;
+                    worstDay = { name: dayNames[day], ...dayData };
+                }
+            });
+
+            if (bestDay && worstDay) {
+                insights.push(createInsight('predictive',
+                    `📅 Pattern detected: ${bestDay.name} is your most productive day (${Math.round(bestDay.avgStudy)}min study, ${Math.round(bestDay.avgScreen)}min screen), while ${worstDay.name} needs attention. Schedule important tasks on your peak days!`,
+                    4, 0.8
+                ));
+            }
+
+            // ============================================
+            // HOLISTIC WELLNESS INSIGHTS
+            // ============================================
+
+            const wellnessScore = (
+                (avgStudy / goals.studyTime) * 0.4 +
+                (avgSleep / goals.sleepHours) * 0.4 +
+                ((goals.screenUsage / avgScreen) * 0.2)
+            ) * 100;
+
+            if (wellnessScore >= 85) {
+                insights.push(createInsight('positive',
+                    `🌟 Outstanding overall wellness! Your comprehensive score is ${wellnessScore.toFixed(0)}/100. You're balancing study, sleep, and digital health excellently. This sustainable approach leads to long-term success!`,
+                    5, 0.9
+                ));
+            } else if (wellnessScore >= 70) {
+                insights.push(createInsight('progress',
+                    `📈 Strong wellness foundation! Score: ${wellnessScore.toFixed(0)}/100. You're building great habits across all areas. Small, consistent improvements will push you into the excellent range!`,
+                    4, 0.8
+                ));
+            } else {
+                insights.push(createInsight('tip',
+                    `🎯 Wellness growth opportunity! Score: ${wellnessScore.toFixed(0)}/100. Focus on your weakest area first - whether it's increasing study, improving sleep, or reducing screen time. Progress in one area often positively impacts others!`,
+                    5, 0.85
+                ));
+            }
+
+            // ============================================
+            // SORT AND RENDER INSIGHTS
+            // ============================================
+
+            insights.sort((a, b) => (b.priority * b.relevance) - (a.priority * a.relevance));
+            renderInsights(insights.slice(0, 6)); // Show top 6 insights
+        };
+
+        const renderInsights = (insights) => {
+            const container = document.getElementById('aiInsights');
+
+            if (insights.length === 0) {
+                container.innerHTML = '<div class="loading-container">No insights available yet</div>';
+                return;
+            }
+
+            container.innerHTML = insights.map(insight => `
+                <div class="insight-card ${insight.type}">
+                    <div class="insight-header">
+                        <span class="insight-type">${insight.type}</span>
+                        <span class="insight-priority">Priority: ${insight.priority}/5</span>
+                    </div>
+                    <div class="insight-message">${insight.message}</div>
+                </div>
+            `).join('');
+        };
+
+        // ============================================
+        // INITIALIZE UI ON PAGE LOAD
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date in form
+            UI.setTodayDate();
+
+            // Update all UI components
+            UI.updateQuickStats();
+            UI.renderCharts();
+            UI.renderHabitLog();
+            generateInsights();
+
+            console.log('Smart Habit Analyzer UI initialized successfully');
+        });
+
+    </script>
+
+</body>
+</html>

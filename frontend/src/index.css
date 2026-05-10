@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-primary-cream-light via-primary-cream to-primary-cream-light;
+    @apply min-h-screen;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300;
+    @apply bg-gradient-to-r from-primary-yellow to-primary-yellow-dark;
+    @apply hover:shadow-lg hover:shadow-primary-yellow/30 hover:-translate-y-0.5;
+    @apply active:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300;
+    @apply bg-gradient-to-r from-primary-red-light to-primary-red;
+    @apply hover:shadow-lg hover:shadow-primary-red/30 hover:-translate-y-0.5;
+    @apply active:translate-y-0;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border-2 border-gray-200;
+    @apply focus:outline-none focus:border-primary-yellow focus:ring-4 focus:ring-primary-yellow/10;
+    @apply transition-all duration-300;
+    @apply pointer-events-auto;
+    @apply enabled:cursor-text;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-xl shadow-gray-200/50;
+    @apply p-6 md:p-8;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-primary-red mb-6;
+    @apply flex items-center gap-3;
+  }
+
+  .section-title::before {
+    content: '';
+    @apply w-1.5 h-8 bg-gradient-to-b from-primary-yellow to-primary-red rounded-full;
+  }
+}

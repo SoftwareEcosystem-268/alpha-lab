@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>พยากรณ์แห่งดวงดาว · ดูดวงไพ่ทาโรต์</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Noto+Serif+Thai:wght@400;500;600;700&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="starfield" id="starfield"></div>
+<div class="mist"></div>
+<svg class="moon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff8d5" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#d4af37" stop-opacity="0.6"/>
+    </radialGradient>
+  </defs>
+  <path d="M 50 10 A 40 40 0 1 0 50 90 A 32 32 0 1 1 50 10 Z"
+        fill="url(#moonGlow)" stroke="#d4af37" stroke-width="0.5"/>
+</svg>
+
+<div class="container">
+
+  <section class="section landing active" id="section-landing">
+    <h2 class="title-main">DIVINATION OF THE STARS</h2>
+    <h1 class="title-thai">พยากรณ์แห่งดวงดาว</h1>
+    <div class="divider-ornate"><span class="divider-ornate-symbol">✦</span></div>
+    <p class="subtitle">
+      เปิดประตูสู่จักรวาล สัมผัสชะตากรรมที่จารึกไว้ด้วยไพ่ยิปซีโบราณ
+      <br>ปล่อยให้พลังจากดวงดาวนำทางให้คุณค้นพบคำตอบที่ซ่อนอยู่ในจิตใต้สำนึก
+    </p>
+    <div class="center-btn">
+      <button class="btn-primary" onclick="goToCategory()">เริ่มเปิดไพ่</button>
+    </div>
+  </section>
+
+  <section class="section" id="section-category">
+    <h2 class="section-title">เลือกประเด็นที่ต้องการพยากรณ์</h2>
+    <p class="section-subtitle">น้อมจิต กำหนดคำถามในใจ แล้วเลือกหมวดที่สอดคล้องกับชะตา</p>
+
+    <div class="category-grid" id="categoryGrid">
+      <div class="category-card" data-category="love">
+        <span class="category-emoji">💕</span>
+        <div class="category-name">ความรัก</div>
+      </div>
+      <div class="category-card" data-category="study">
+        <span class="category-emoji">📚</span>
+        <div class="category-name">การเรียน</div>
+      </div>
+      <div class="category-card" data-category="work">
+        <span class="category-emoji">💼</span>
+        <div class="category-name">การทำงาน</div>
+      </div>
+      <div class="category-card" data-category="money">
+        <span class="category-emoji">💰</span>
+        <div class="category-name">การเงิน</div>
+      </div>
+      <div class="category-card" data-category="general">
+        <span class="category-emoji">🌟</span>
+        <div class="category-name">ดวงชะตาภาพรวม</div>
+      </div>
+    </div>
+
+    <div class="question-input-wrap">
+      <label class="question-label">หากต้องการ ระบุคำถามเพิ่มเติม (ไม่จำเป็น)</label>
+      <textarea class="question-input" id="questionInput"
+                placeholder="เช่น ความสัมพันธ์กับคนที่กำลังคุยอยู่จะเป็นอย่างไร..."
+                maxlength="200"></textarea>
+    </div>
+
+    <div class="center-btn">
+      <button class="btn-primary" id="btnStartDraw" onclick="goToDraw()" disabled>เปิดไพ่</button>
+    </div>
+  </section>
+
+  <section class="section" id="section-draw">
+    <div class="draw-status">
+      <div class="draw-position" id="drawPosition">🔮 ใบที่ 1: เจ้าชะตา</div>
+      <div class="draw-position-desc" id="drawDesc">ตัวคุณ บุคลิก พลังงานในตัว</div>
+      <div class="draw-progress" id="drawProgress">
+        <div class="progress-dot active"></div>
+        <div class="progress-dot"></div>
+        <div class="progress-dot"></div>
+      </div>
+    </div>
+
+    <div class="fan-container">
+      <div class="fan-wrap" id="fanWrap"></div>
+    </div>
+  </section>
+
+  <section class="section result-section" id="section-result">
+    <h2 class="section-title">คำพยากรณ์จากจักรวาล</h2>
+    <p class="section-subtitle" id="resultSubtitle"></p>
+
+    <div class="selected-cards" id="selectedCardsDisplay"></div>
+
+    <div id="readingsContainer"></div>
+
+    <div class="action-row">
+      <button class="btn-secondary" onclick="resetAll()">เปิดไพ่ใหม่</button>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <p class="footer-text">
+    <span class="footer-ornate">✦</span>
+    หากต้องการดูดวงเชิงลึกเพิ่มเติม ติดต่อได้ที่
+    <span class="footer-ornate">✦</span>
+  </p>
+  <a class="footer-ig" href="https://instagram.com/thanxt.v" target="_blank" rel="noopener">
+    📷 Instagram: @thanxt.v
+  </a>
+  <p class="footer-credit">
+    รูปไพ่จาก Rider-Waite-Smith Tarot Deck (1909, Public Domain) · ภาพโดย Pamela Colman Smith
+  </p>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

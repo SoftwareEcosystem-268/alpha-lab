@@ -1,0 +1,31 @@
+# PDF ต้นฉบับ - ไม่ push (ลิขสิทธิ์ + ใหญ่เกิน 100MB)
+*.pdf
+tarot.pdf
+
+# ไฟล์ text ที่แปลงจาก PDF
+tarot-text.txt
+
+# ระบบ macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python cache (ถ้ามีรัน script)
+__pycache__/
+*.pyc
+*.pyo
+pdf.py
+
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Reference files
+index 2.html
+Reference*.png
+Screenshot*.png

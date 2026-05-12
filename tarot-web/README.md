@@ -4,9 +4,8 @@
 
 ## 🌐 Live Demo
 
-**👉 [คลิกที่นี่เพื่อเปิดเว็บ](https://thanatvij.github.io/tarot-divination/)**
+**👉 [คลิกที่นี่เพื่อเปิดเว็บ]([https://thanatvij.github.io/tarot/](https://thanatvij.github.io/tarot/))**
 
-> _เปลี่ยน URL ให้ตรงกับ GitHub Pages ของคุณหลัง deploy_
 
 ---
 
@@ -84,9 +83,3 @@ tarot-web/
 ## 👤 ผู้พัฒนา
 
 **Thanat** · DTI (Digital Technology and Innovation), Thammasat University Lampang
-
-📷 Instagram: [@thanxt.v](https://instagram.com/thanxt.v)
-
----
-
-> _ติดต่อสำหรับการดูดวงเชิงลึกเพิ่มเติม_

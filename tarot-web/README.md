@@ -4,7 +4,7 @@
 
 ## 🌐 Live Demo
 
-**👉 [คลิกที่นี่เพื่อเปิดเว็บ]([https://thanatvij.github.io/tarot/](https://thanatvij.github.io/tarot/))**
+**👉 [คลิกที่นี่เพื่อเปิดเว็บ](https://thanatvij.github.io/tarot/)**
 
 
 ---
